@@ -146,7 +146,7 @@ class TestBooksCollector:
     # тесты для получения книг, подходящих детям
     def test_get_books_for_children_with_allowed_genre_returns_list(
             self, collector):
-        """Книги с разрешённым жанром возвращаются для детей"""
+        """Возвращается список книг с разрешённым жанром"""
         collector.add_new_book('Harry_Potter')
         collector.set_book_genre('Harry_Potter', 'Фантастика')
         assert collector.get_books_for_children() == ['Harry_Potter']
