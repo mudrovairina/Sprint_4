@@ -36,7 +36,7 @@ class TestBooksCollector:
     def test_add_new_book_valid_name_added(self, collector, name):
         """Книга с допустимой длиной названия добавляется"""
         collector.add_new_book(name)
-        assert collector.books_genre == {name: ''}
+        assert collector.get_books_genre() == {name: ''}
 
     @pytest.mark.parametrize(
         "name",
@@ -49,13 +49,13 @@ class TestBooksCollector:
     def test_add_new_book_invalid_name_not_added(self, collector, name):
         """Книга с недопустимой длиной названия не добавляется"""
         collector.add_new_book(name)
-        assert collector.books_genre == {}
+        assert collector.get_books_genre() == {}
 
     def test_add_new_book_duplicate_name_not_added(self, collector):
         """Книга с повторяющимся названием не добавляется повторно"""
         collector.add_new_book('The Green Mile')
         collector.add_new_book('The Green Mile')
-        assert collector.books_genre == {'The Green Mile': ''}
+        assert collector.get_books_genre() == {'The Green Mile': ''}
 
     # тесты для устанавливания книге жанра
     def test_set_book_genre_book_in_dict_and_genre_available_genre_set(
@@ -63,18 +63,18 @@ class TestBooksCollector:
         """Книге из словаря можно установить доступный жанр"""
         collector.add_new_book('The Green Mile')
         collector.set_book_genre('The Green Mile', 'Фантастика')
-        assert collector.books_genre['The Green Mile'] == 'Фантастика'
+        assert collector.get_book_genre('The Green Mile') == 'Фантастика'
 
     def test_set_book_genre_book_not_in_dict_genre_not_set(self, collector):
         """Если книги нет в словаре, жанр не устанавливается"""
         collector.set_book_genre('Fight Club', 'Фантастика')
-        assert 'Fight Club' not in collector.books_genre
+        assert 'Fight Club' not in collector.get_books_genre()
 
     def test_set_book_genre_unavailable_genre_not_set(self, collector):
         """Если жанра нет в списке доступных, он не устанавливается"""
         collector.add_new_book('The Green Mile')
         collector.set_book_genre('The Green Mile', 'Про любовь')
-        assert collector.books_genre['The Green Mile'] == ''
+        assert collector.get_book_genre('The Green Mile') == ''
 
     # тесты для получения жанра книги
     def test_get_book_genre_book_in_dict_returns_genre(self, collector):
@@ -189,14 +189,14 @@ class TestBooksCollector:
         for book in books:
             collector.add_new_book(book)
             collector.add_book_in_favorites(book)
-        assert collector.favorites == books
+        assert collector.get_list_of_favorites_books() == books
 
     def test_add_book_in_favorites_duplicate_book_not_added(self, collector):
         """Одна и та же книга не может добавляться в избранное дважды"""
         collector.add_new_book('The Green Mile')
         collector.add_book_in_favorites('The Green Mile')
         collector.add_book_in_favorites('The Green Mile')
-        assert collector.favorites == ['The Green Mile']
+        assert collector.get_list_of_favorites_books() == ['The Green Mile']
 
     @pytest.mark.parametrize("book", ['Fight Club', ''])
     def test_add_book_in_favorites_nonexistent_book_not_added(
@@ -204,7 +204,7 @@ class TestBooksCollector:
         """Книги, которых нет в словаре или пустое название,
         не добавляются в избранное"""
         collector.add_book_in_favorites(book)
-        assert collector.favorites == []
+        assert collector.get_list_of_favorites_books() == []
 
     # тесты для удаления книги из Избранного
     def test_delete_book_from_favorites_existing_book_removed(self, collector):
@@ -212,7 +212,7 @@ class TestBooksCollector:
         collector.add_new_book('The Green Mile')
         collector.add_book_in_favorites('The Green Mile')
         collector.delete_book_from_favorites('The Green Mile')
-        assert collector.favorites == []
+        assert collector.get_list_of_favorites_books() == []
 
     def test_delete_book_from_favorites_nonexistent_book_list_unchanged(
             self, collector):
@@ -220,7 +220,7 @@ class TestBooksCollector:
         collector.add_new_book('The Green Mile')
         collector.add_book_in_favorites('The Green Mile')
         collector.delete_book_from_favorites('Fight Club')
-        assert collector.favorites == ['The Green Mile']
+        assert collector.get_list_of_favorites_books() == ['The Green Mile']
 
     def test_delete_book_from_favorites_one_of_two_books_removed_only_that_one(
             self, collector):
@@ -230,13 +230,13 @@ class TestBooksCollector:
         collector.add_new_book('Fight Club')
         collector.add_book_in_favorites('Fight Club')
         collector.delete_book_from_favorites('The Green Mile')
-        assert collector.favorites == ['Fight Club']
+        assert collector.get_list_of_favorites_books() == ['Fight Club']
 
     def test_delete_book_from_favorites_empty_favorites_list_unchanged(
             self, collector):
         """Попытка удалить книгу из пустого списка не вызывает ошибок"""
         collector.delete_book_from_favorites('The Green Mile')
-        assert collector.favorites == []
+        assert collector.get_list_of_favorites_books() == []
 
     def test_delete_book_from_favorites_already_removed_book_list_unchanged(
             self, collector):
@@ -245,7 +245,7 @@ class TestBooksCollector:
         collector.add_book_in_favorites('The Green Mile')
         collector.delete_book_from_favorites('The Green Mile')  # первый раз
         collector.delete_book_from_favorites('The Green Mile')  # второй раз
-        assert collector.favorites == []
+        assert collector.get_list_of_favorites_books() == []
 
     # тесты для получения списка избранных книг
     def test_get_list_of_favorites_books_one_book_returns_list(
